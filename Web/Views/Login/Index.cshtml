@@ -1,0 +1,42 @@
+﻿
+<div class="container">
+
+    <div>
+        <label for="username">Username</label>
+        <input class="form-control col-5" id="username" type="text" />
+        <label for="password">Password</label>
+        <input class="form-control col-5" id="password" type="password" />
+        <button class="btn btn-primary" onclick="ControlLogin()">Login</button>
+    </div>
+
+</div>
+
+<script>
+     function ControlLogin() {
+         var username = $('#username').val();
+         var password = $('#password').val();
+        $.ajax({
+            url: '@Url.Action("ControlLogin", "Login")',
+            data: {
+                "_username": username,
+                "_userPassword": password
+
+            },
+            type: "POST",
+            success: function (data) {
+                if (data == true) {
+                    window.location = "@Url.Action("Index","Home")";
+                }
+                else {
+                    alert("Username or Password wrong.");
+                }
+            },
+            error: function (hata, ajaxOptions, thrownError) {
+                console.log(hata.status);
+                console.log(thrownError);
+                console.log(hata.responseText);
+            }
+        });
+    }
+
+</script>

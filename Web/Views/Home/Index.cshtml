@@ -1,0 +1,230 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model List<Web.Entities.Products>;
+
+<button class="btn btn-primary mb-3" id="addButton" data-toggle="modal" data-target="#addModal">Add New Product</button>
+@*ADD MODAL*@
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Add New Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row mb-3">
+                        <label for="productName" class="col-4">Product Name:</label>
+                        <input type="text" class="form-control col-6" id="productName" />
+                    </div>
+                    <div class="row mb-3">
+                        <label for="date" class="col-4">Added Date:</label>
+                        <input type="datetime-local" class="form-control col-6" id="date" />
+                    </div>
+                    <div class="row mb-3">
+                        <label for="quantity" class="col-4">Added Date:</label>
+                        <input type="number" class="form-control col-6" placeholder="You can only enter numbers." id="quantity" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" onclick="AddNewProduct()" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*UPDATE MODAL*@
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Update Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row mb-3">
+                        <input type="text" class="form-control col-6" id="updateId" style="display:none;" />
+                        <label for="updateProductName" class="col-4">Product Name:</label>
+                        <input type="text" class="form-control col-6" id="updateProductName" />
+                    </div>
+                    <div class="row mb-3">
+                        <label for="updateDate" class="col-4">Added Date:</label>
+                        <input type="datetime-local" class="form-control col-6" id="updateDate" />
+                    </div>
+                    <div class="row mb-3">
+                        <label for="updateQuantity" class="col-4">Quantity:</label>
+                        <input type="number" class="form-control col-6" placeholder="You can only enter numbers." id="updateQuantity" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" onclick="UpdateProduct()" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table id="productTable" class="table">
+    <thead>
+        <tr>
+            <th scope="col">Product Name</th>
+            <th scope="col">Added Date</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">#</th>
+            <th scope="col">#</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>@item.ProductName</td>
+            <td>@item.AddedDate</td>
+            <td>@item.Quantity</td>
+            <td><button class="btn btn-success mb-3" id="updateButton" onclick="GetProductById(@item.Id)">Update</button></td>
+            <td><button class="btn btn-danger mb-3" id="deleteButton" onclick="DeleteProduct(@item.Id)">Delete</button></td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+
+<script>
+    $(document).ready(function () {
+        $('#productTable').DataTable();
+
+        $("#productTable_filter").addClass("d-flex justify-content-end");
+        $("#productTable_filter").css("margin-left","650px");
+    });
+
+    function AddNewProduct() {
+        var productName = $('#productName').val();
+        var date = $('#date').val();
+        var quantity = $('#quantity').val();
+        $.ajax({
+            url: '@Url.Action("AddNewProduct", "Home")',
+            data: {
+                "_productName": productName,
+                "_dateTime": date,
+                "_quantity": quantity
+
+            },
+            type: "POST",
+            success: function (data) {
+                if (data == true) {
+                    alert("Başarıyla kaydedildi!");
+                    location.reload();
+                }
+                else {
+                    alert("error");
+                }
+            },
+            error: function (hata, ajaxOptions, thrownError) {
+                console.log(hata.status);
+                console.log(thrownError);
+                console.log(hata.responseText);
+            }
+        });
+    }
+
+    function UpdateProduct() {
+        var id = $('#updateId').val();
+        var productName = $('#updateProductName').val();
+        var date = $('#updateDate').val();
+        var quantity = $('#updateQuantity').val();
+        $.ajax({
+            url: '@Url.Action("UpdateProduct", "Home")',
+            data: {
+                "_id": id,
+                "_productName": productName,
+                "_dateTime": date,
+                "_quantity": quantity
+
+            },
+            type: "POST",
+            success: function (data) {
+                if (data == true) {
+                    alert("Başarıyla kaydedildi!");
+                    location.reload();
+                }
+                else {
+                    alert("error");
+                }
+            },
+            error: function (hata, ajaxOptions, thrownError) {
+                console.log(hata.status);
+                console.log(thrownError);
+                console.log(hata.responseText);
+            }
+        });
+    }
+
+    function DeleteProduct(_id) {
+        //var productName = $('#productName').val();
+        //var date = $('#date').val();
+        //var quantity = $('#quantity').val();
+        $.ajax({
+            url: '@Url.Action("DeleteProduct", "Home")',
+            data: {
+                "_id": _id
+
+            },
+            type: "POST",
+            success: function (data) {
+                if (data == true) {
+                    alert("Başarıyla silindi!");
+                    location.reload();
+                }
+                else {
+                    alert("error");
+                }
+            },
+            error: function (hata, ajaxOptions, thrownError) {
+                console.log(hata.status);
+                console.log(thrownError);
+                console.log(hata.responseText);
+            }
+        });
+    }
+
+    function GetProductById(_id) {
+        $.ajax({
+            url: '@Url.Action("GetProductById", "Home")',
+            data: {
+                "_id": _id
+
+            },
+            type: "POST",
+            success: function (data) {
+                if (data) {
+                    var deserilazedData = JSON.parse(data);
+
+                    $('#updateModal').modal('show');
+                    $('#updateId').val(deserilazedData.Id);
+                    $('#updateProductName').val(deserilazedData.ProductName);
+                    $('#updateDate').val(deserilazedData.AddedDate);
+                    $('#updateQuantity').val(deserilazedData.Quantity);
+
+                }
+                else {
+                    alert("error");
+                }
+            },
+            error: function (hata, ajaxOptions, thrownError) {
+                console.log(hata.status);
+                console.log(thrownError);
+                console.log(hata.responseText);
+            }
+        });
+    }
+
+</script>
